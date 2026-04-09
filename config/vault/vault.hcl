@@ -6,7 +6,7 @@ listener "tcp" {
   tls_disable = 1
 }
 
-api_addr     = "http://http://vault.container.local.jmpd.in:8200"
+api_addr     = "http://vault.container.local.jmpd.in:8200"
 cluster_addr = "http://127.0.0.1:8201"
 
 storage "raft" {
