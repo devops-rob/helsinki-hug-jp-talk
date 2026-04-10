@@ -11,9 +11,13 @@ provider "terracurl" {
   
 }
 
+variable "vault_addr" {
+  default = ""
+}
+
 resource "terracurl_request" "vault_init" {
     name = "vault_init"
-    url = "http://vault.container.local.jmpd.in:8200/v1/sys/init"
+    url = "${var.vault_addr}/v1/sys/init"
 
     method = "POST"
 
@@ -29,7 +33,7 @@ resource "terracurl_request" "vault_unseal" {
     depends_on = [terracurl_request.vault_init]
 
     name = "vault_unseal"
-    url  = "http://vault.container.local.jmpd.in:8200/v1/sys/unseal"
+    url  = "${var.vault_addr}/v1/sys/unseal"
 
     method = "POST"
 
