@@ -44,23 +44,23 @@ resource "container" "vault" {
 
 }
 
-# resource "terraform" "init" {
-#   source = "./terraform/vault-init"
-#   working_directory = "/"
-#   version = "1.14.8"
+resource "terraform" "init" {
+  source            = "./terraform/vault-init"
+  working_directory = "/"
+  version           = "1.14.8"
 
-#   network {
-#     id = resource.network.local.meta.id
-#   }
+  network {
+    id = resource.network.local.meta.id
+  }
 
-#   depends_on = ["resource.container.vault"]
+  depends_on = ["resource.container.vault"]
   
-# }
+}
 
-# output "unseal_keys" {
-#   value = resource.terraform.init.output.keys
-# }
+output "unseal_keys" {
+  value = resource.terraform.init.output.keys
+}
 
-# output "root_token" {
-#   value = resource.terraform.init.output.root_token
-# }
+output "root_token" {
+  value = resource.terraform.init.output.root_token
+}
