@@ -38,7 +38,7 @@ resource "terracurl_request" "vault_unseal" {
     method = "POST"
 
     request_body = jsonencode({
-        key = element(jsondecode(terracurl_request.vault_init.response).keys, 0)
+        key = jsondecode(terracurl_request.vault_init.response).keys[0]
     })
 
     response_codes = ["200"]

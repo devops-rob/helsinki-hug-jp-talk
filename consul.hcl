@@ -1,3 +1,4 @@
+# 2. jp_consul_resource https://jumppad.dev/docs/resources/container/container
 resource "container" "consul" {
     network {
         id         = resource.network.local.meta.id
@@ -14,13 +15,9 @@ resource "container" "consul" {
         "-client=0.0.0.0"
     ]
 
-
-
-
     environment = {
         CONSUL_HTTP_ADDR = "http://localhost:8500"
     }
-
 
     port {
         local  = 8500

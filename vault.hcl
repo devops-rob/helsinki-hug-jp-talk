@@ -1,3 +1,4 @@
+# 3. jp_vault_resource https://jumppad.dev/docs/resources/container/container
 resource "container" "vault" {
   depends_on = ["resource.container.consul"]
 
@@ -52,6 +53,7 @@ resource "container" "vault" {
 
 }
 
+# 4. jp_vault_init https://jumppad.dev/docs/resources/terraform
 resource "terraform" "init" {
   source            = "./terraform/vault-init"
   working_directory = "/"
@@ -61,10 +63,15 @@ resource "terraform" "init" {
     id = resource.network.local.meta.id
   }
 
+  variables = {
+    vault_addr = "http://${resource.container.vault.container_name}:8200"
+  }
+
   depends_on = ["resource.container.vault"]
   
 }
 
+# 5. jp_terraform_template_resource https://jumppad.dev/docs/resources/template
 resource "template" "terraform_oidc" {
   source      = file("./terraform/vault-oidc/main.tpl")
   destination = "./terraform/vault-oidc/main.tf"
@@ -76,6 +83,7 @@ resource "template" "terraform_oidc" {
   }
 }
 
+#6. jp_vault_configuration https://jumppad.dev/docs/resources/terraform
 resource "terraform" "vault_configure" {
 
   depends_on = ["resource.template.terraform_oidc"]
@@ -90,26 +98,17 @@ resource "terraform" "vault_configure" {
   }
 }
 
-
-output "unseal_keys" {
-  value = resource.terraform.init.output.keys
-}
-
-output "root_token" {
-  value = resource.terraform.init.output.root_token
-  variables = {
-    vault_addr = "http://${resource.container.vault.container_name}:8200"
-  }
-}
-
+# 7 jp_output_unseal_keys https://jumppad.dev/docs/resources/internal/output
 output "unseal_keys" {
   value = resource.terraform.init.output.vault_init_unseal_keys
 }
 
+# 8. jp_output_vault_addr https://jumppad.dev/docs/resources/internal/output
 output "VAULT_ADDR" {
   value = "http://${resource.container.vault.container_name}:8200"
 }
 
+# 9. jp_output_vault_root_token https://jumppad.dev/docs/resources/internal/output
 output "VAULT_ROOT_TOKEN" {
   value = resource.terraform.init.output.vault_init_root_token
 }
