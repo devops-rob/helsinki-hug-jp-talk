@@ -1,2 +1,4 @@
 .idea
+/terraform/vault-oidc/main.tf
+/terraform/vault-oidc/.terraform.lock.hcl
 .terraform

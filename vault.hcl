@@ -37,10 +37,18 @@ resource "container" "vault" {
     destination = "/files"
   }
 
-  volume {
-    source      = "${data("temp")}"
-    destination = "/vault/data"
-  }
+    volume {
+        source      = "${data("temp")}"
+        destination = "/vault/data"
+    }
+
+    health_check {
+      timeout = "30s"
+      http {
+        address = "http://localhost:8200/v1/sys/health?sealedcode=200&uninitcode=200"
+        success_codes = [200]
+      }
+    }
 
 }
 
@@ -53,6 +61,42 @@ resource "terraform" "init" {
     id = resource.network.local.meta.id
   }
 
+  depends_on = ["resource.container.vault"]
+  
+}
+
+resource "template" "terraform_oidc" {
+  source      = file("./terraform/vault-oidc/main.tpl")
+  destination = "./terraform/vault-oidc/main.tf"
+
+  variables = {
+    vault_addr  = resource.container.vault.container_name
+    vault_token = resource.terraform.init.output.vault_init_root_token
+    nomad_addr  = resource.nomad_cluster.dev.server_container_name
+  }
+}
+
+resource "terraform" "vault_configure" {
+
+  depends_on = ["resource.template.terraform_oidc"]
+
+  source            = "./terraform/vault-oidc"
+  version           = "1.14.8"
+  working_directory = "/"
+
+
+  network {
+    id = resource.network.local.meta.id
+  }
+}
+
+
+output "unseal_keys" {
+  value = resource.terraform.init.output.keys
+}
+
+output "root_token" {
+  value = resource.terraform.init.output.root_token
   variables = {
     vault_addr = "http://${resource.container.vault.container_name}:8200"
   }
