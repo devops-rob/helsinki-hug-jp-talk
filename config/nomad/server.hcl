@@ -18,3 +18,7 @@ vault {
 consul {
   address = "consul.container.local.jmpd.in:8500"
 }
+
+server {
+  oidc_issuer = "server.dev.nomad-cluster.local.jmpd.in:4646"
+}
